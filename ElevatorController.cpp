@@ -33,7 +33,9 @@ void ElevatorController::setup() {
     CM.setTxdata(FLOOR1);                                  // FLOOR1, FLOOR2, FLOOR3    
     LCDM.lcdObj.setCursor(0, 0);
     LCDM.lcdObj.print("Floor 1");
-    CM.setSetpoint(FLOOR1_SP);                              // Initialize default setpoint to that of FLOOR1  
+    CM.setSetpoint(FLOOR1_SP);                              // Initialize default setpoint to that of FLOOR1
+
+    m_currentFloor = 0; // Unknown
 
     // Initialize flags
     flagRecv = false;
@@ -41,16 +43,21 @@ void ElevatorController::setup() {
 }
 
 void ElevatorController::loop() {
+    // Receive CAN message for which floor to go to
     if (flagRecv) {                                         // Receive message (INT_PIN triggers interrupt that sets flagRecv true to indicate that a new message has been received)
         flagRecv = false;                                   // Reset the flag as we will use it again if another request is received
         CM.receiveCAN(LCDM);                                // Receive the message 
     }
 
+    // Transmit CAN message to tell everyone the current elevator floor every few seconds
     if (flagTx) {                                           // Use a timer interrupt (that sets flagTx true) to transmit the current floor every few seconds
         flagTx = false;
+        CM.setTxData(m_currentFloor);
         CM.transmitCAN();                                   // Send the current floor via CAN 
     }
-    Move(CM.getSetpoint());                                 // Move to setpoint distance location - sends data to the DAC to move to setpoint
+
+    Move(CM.getSetpoint());
+    checkCurrentFloor();
 }
  
 	
@@ -75,21 +82,23 @@ void ElevatorController::initializeTimer() {
 }
 
 // Move to setpoint distance (floor)
-void ElevatorController::Move(uint16_t sp) {
+void ElevatorController::Move(uint16_t setpoint) {
+  	int difference = 0; // Difference in mm from setpoint (floor). A positive value is above the setpoint distance (floor) and a negative value is below.
+    
     DSM.sensor.start();
-    dist = DSM.sensor.getDistance();
+    m_dist = DSM.sensor.getDistance();
     delay(100);
     DSM.sensor.stop();
 
-    if (dist > MINHEIGHT && dist < MAXHEIGHT) {
+    if (m_dist > MINHEIGHT && m_dist < MAXHEIGHT) {
         // Output the distance to the LCD
-        LCDM.loop(dist);
+        LCDM.loop(m_dist);
 
         //Output the difference between setpoint and distance
-        difference = dist - sp;                                // positive value means above setpoint (later take the negative of this value to indicate direction to move - i.e. down)
-        //Serial.print("Distance ");                           // Testing
-        //Serial.println(dist);                                // Testing
-        if (abs(difference) <= 50) {                           // Stop when within 5cm of setpoint
+        difference = m_dist - setpoint;        // positive value means above setpoint (later take the negative of this value to indicate direction to move - i.e. down)
+        //Serial.print("Distance ");           // Testing
+        //Serial.println(m_dist);              // Testing
+        if (abs(difference) <= 50) {           // Stop when within 5cm of setpoint
             difference = 0;
         }
 
@@ -111,3 +120,15 @@ void ElevatorController::Move(uint16_t sp) {
     }
 }
 
+void ElevatorController::checkCurrentFloor() {
+    // Check current floor
+    if ((m_dist >= FLOOR1_SP - 50) && (m_dist <= FLOOR1_SP + 50)) {
+        m_currentFloor = FLOOR1;
+    } else if ((m_dist >= FLOOR2_SP - 50) && (m_dist <= FLOOR2_SP + 50)) {
+        m_currentFloor = FLOOR2;
+    } else if ((m_dist >= FLOOR3_SP - 50) && (m_dist <= FLOOR3_SP + 50)) {
+        m_currentFloor = FLOOR3;
+    } else {
+      // If the car is between floors, keep repeating the last known floor
+    }
+}

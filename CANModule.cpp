@@ -45,7 +45,6 @@ void CANModule::setTxdata(byte data)                                      // Set
 
 // Transmit CAN message
 void CANModule::transmitCAN() {
-    // send data:  ID = 0x100, Standard CAN Frame, Data length = 8 bytes, 'data' = array of data bytes to send
     byte sndStat = mcp2515.sendMsgBuf(TxID, 0, DLC, txdata);
     if (sndStat == CAN_OK) {
         Serial.println("Message Sent Successfully!");
@@ -77,10 +76,7 @@ void CANModule::receiveCAN(LCD lcd) {
             Serial.print(msgString);
         }
     }
-    Serial.println();
-
-    // Use next line of code to repeat the floor value received every few seconds (later can transmit actual floor number based on distance measurement)
-    txdata[0] = rxdata[0];                                      // Send back the received destination floor number                     
+    Serial.println();                  
 
     // Change setpoint and output new destination floor
     lcd.lcdObj.setCursor(0, 0);                                   // Set cursor to column 0, line 0  (line 1 is second row since counting starts at 0)
