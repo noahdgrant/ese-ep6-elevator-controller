@@ -97,8 +97,7 @@ void CANModule::receiveCAN(LCD lcd) {
         lcd.lcdObj.print("Floor 3");
     }
     else {
-        setpoint = FLOOR1_SP;
-        lcd.lcdObj.print("Floor 1");
+      // Do nothing on unknown command
     }
 }
 
