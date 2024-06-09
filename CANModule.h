@@ -37,11 +37,6 @@
 #define MASK0 0x07FF0000                    // Mask0 for Filter 0 and Filter 1
 #define MASK1 0x07FF0000                    // Mask1 for Filters 2, 3,4 and 5 (there are only 6 filters total. See explanation at: https://forum.arduino.cc/t/mcp2515-can-filtering/506401 )
 #define FILTER_SC 0x01000000                // Acceptance filter for ID 0x100 (Supervisory Controller - Raspberry Pi)
-#define FILTER_EC 0x01010000                // Acceptance filter for ID 0x101 (Elevator Controller) -- comment out if only want to accept commands from Supervisory controller
-#define FILTER_CC 0x02000000                // Acceptance filter for ID 0x200 (Car Controller)
-#define FILTER_F1 0x02010000                // Acceptance filter for ID 0x201 (Floor 1 Controller)
-#define FILTER_F2 0x02020000                // Acceptance filter for ID 0x202 (Floor 2 Controller)
-#define FILTER_F3 0x02030000                // Acceptance filter for ID 0x203 (Floor 3 Controller)
 
 class CANModule {
 public:
