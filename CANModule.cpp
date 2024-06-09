@@ -123,26 +123,6 @@ void CANModule::initializeCAN() {
         mcp2515.init_Filt(0, 0, FILTER_SC);            // init_Filt(filter number, 0 for standard mode, filter used to accept a matching ID) - Filter 1
     #endif
 
-    #ifdef FILTER_EC
-        mcp2515.init_Filt(1, 0, FILTER_EC);
-    #endif
-
-    #ifdef FILTER_CC
-        mcp2515.init_Filt(2, 0, FILTER_CC);
-    #endif
-
-    #ifdef FILTER_F1
-        mcp2515.init_Filt(3, 0, FILTER_F1);
-    #endif
-
-    #ifdef FILTER_F2
-        mcp2515.init_Filt(4, 0, FILTER_F2);
-    #endif
-
-    #ifdef FILTER_F3
-        mcp2515.init_Filt(5, 0, FILTER_F3);
-    #endif
-
     mcp2515.setMode(MCP_NORMAL);                              // Change to normal mode to allow messages to be transmitted
     pinMode(INT_PIN, INPUT);                                  // Interrupt pin triggered by SLAVE (CAN Adapter) to ask MASTER to initiate SPI communication
     pinMode(SPI_CS_PIN, OUTPUT);                              // Chip select pin for CAN module
