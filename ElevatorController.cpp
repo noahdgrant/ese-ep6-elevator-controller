@@ -33,7 +33,7 @@ void ElevatorController::setup() {
     CM.setTxdata(FLOOR1);                                  // FLOOR1, FLOOR2, FLOOR3    
     LCDM.lcdObj.setCursor(0, 0);
     LCDM.lcdObj.print("Floor 1");
-    CM.setSetpoint(FLOOR1_SP);                              // Initialize default setpoint to that of FLOOR1
+    CM.setSetpoint(FLOOR1_SP);                             // Initialize default setpoint to that of FLOOR1
 
     m_currentFloor = 0; // Unknown
 
@@ -52,7 +52,7 @@ void ElevatorController::loop() {
     // Transmit CAN message to tell everyone the current elevator floor every few seconds
     if (flagTx) {                                           // Use a timer interrupt (that sets flagTx true) to transmit the current floor every few seconds
         flagTx = false;
-        CM.setTxData(m_currentFloor);
+        CM.setTxdata(m_currentFloor);
         CM.transmitCAN();                                   // Send the current floor via CAN 
     }
 

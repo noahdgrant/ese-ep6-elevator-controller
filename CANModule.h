@@ -34,8 +34,7 @@
 #define FLOOR2_SP 635                       // Floor 2 setpoint 700mm from bottom (sensor)
 #define FLOOR3_SP 1220                      // Floor 3 setpoint 1000mm from bottom (sensor)
 // Sets the care/don't care bits in the ID (11 bits long for Standard CAN) [first 4 nibbles] and first two bytes of data [last four nibbles]. Using this mask we care about all ID bits so that ID of a message must match a filter below.    
-#define MASK0 0x07FF0000                    // Mask0 for Filter 0 and Filter 1
-#define MASK1 0x07FF0000                    // Mask1 for Filters 2, 3,4 and 5 (there are only 6 filters total. See explanation at: https://forum.arduino.cc/t/mcp2515-can-filtering/506401 )
+#define MASK 0x07FF0000                    // Mask for filters
 #define FILTER_SC 0x01000000                // Acceptance filter for ID 0x100 (Supervisory Controller - Raspberry Pi)
 
 class CANModule {
