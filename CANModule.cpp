@@ -45,15 +45,14 @@ void CANModule::setTxdata(byte data)                                      // Set
 
 // Transmit CAN message
 void CANModule::transmitCAN() {
-    // send data:  ID = 0x100, Standard CAN Frame, Data length = 8 bytes, 'data' = array of data bytes to send
     byte sndStat = mcp2515.sendMsgBuf(TxID, 0, DLC, txdata);
     if (sndStat == CAN_OK) {
-        Serial.println("Message Sent Successfully!");
-        Serial.println(txdata[0]);
+        sprintf(msgString, "[CAN] TX: ID: 0x%X Data: 0x%X", TxID, txdata[0]);
     }
     else {
-        Serial.println("Error Sending Message...");
+        sprintf(msgString, "[CAN] TX: Error Sending Message...");
     }
+    Serial.println(msgString);
 }
 
 // Receive CAN message (based on sample code in library)
@@ -61,9 +60,9 @@ void CANModule::receiveCAN(LCD lcd) {
     mcp2515.readMsgBuf(&RxID, &len, rxdata);                    // Read data: len = data length, rxdata = data byte(s)
 
     if ((RxID & 0x80000000) == 0x80000000)                      // Determine if ID is standard (11 bits) or extended (29 bits)    - Note: This library has the IDE bit in the first nibble, this is different than the order in an extended CAN frame
-        sprintf(msgString, "Extended ID: 0x%.8lX  DLC: %1d  Data:", (RxID & 0x1FFFFFFF), len);   // If extended ID is used then all bits are ID (uses last 29 of the 32 possible bits in the 4 byte ID) 
+        sprintf(msgString, "[CAN] RX: Extended ID: 0x%.8lX DLC: %1d Data:", (RxID & 0x1FFFFFFF), len);   // If extended ID is used then all bits are ID (uses last 29 of the 32 possible bits in the 4 byte ID) 
     else
-        sprintf(msgString, "Standard ID: 0x%.3lX       DLC: %1d  Data:", RxID, len);
+        sprintf(msgString, "[CAN] RX: Standard ID: 0x%.3lX DLC: %1d Data:", RxID, len);
 
     Serial.print(msgString);
 
@@ -77,10 +76,7 @@ void CANModule::receiveCAN(LCD lcd) {
             Serial.print(msgString);
         }
     }
-    Serial.println();
-
-    // Use next line of code to repeat the floor value received every few seconds (later can transmit actual floor number based on distance measurement)
-    txdata[0] = rxdata[0];                                      // Send back the received destination floor number                     
+    Serial.println();                  
 
     // Change setpoint and output new destination floor
     lcd.lcdObj.setCursor(0, 0);                                   // Set cursor to column 0, line 0  (line 1 is second row since counting starts at 0)
@@ -105,7 +101,7 @@ void CANModule::receiveCAN(LCD lcd) {
 void CANModule::initializeCAN() {
     Serial.println("Starting CAN init");
     // Initialize MCP2515 running at 8MHz with a baudrate of 125kb/s and the masks and filters enabled in standard mode. (USE MCP_ANY to disable masks and filters and MCP_STD to only check the ID bytes)
-    if (mcp2515.begin(MCP_STDEXT, CAN_125KBPS, MCP_8MHZ) == CAN_OK) {              // Change to MCP_ANY TO DISABLE MASK AND FILTERS, MCP_STD to use CAN Standard mode IDs
+    if (mcp2515.begin(MCP_STD, CAN_125KBPS, MCP_8MHZ) == CAN_OK) {              // Change to MCP_ANY TO DISABLE MASK AND FILTERS, MCP_STD to use CAN Standard mode IDs
         Serial.println("MCP2515 Initialized Successfully!");   
     }
     else {
@@ -113,14 +109,13 @@ void CANModule::initializeCAN() {
     }
     Serial.println("Finished CAN init");
 
-    // Set masks and filters based on values in ElevatorController.h - 
-    #ifdef MASK 
-        mcp2515.init_Mask(0, 0, MASK0);                 // Mask0 for Filter 0 and Filter 1
-        mcp2515.init_Mask(1, 0, MASK1);                 // Mask1 for Filters 2, 3,4 and 5 (there are only 6 filters total. See explanation at: https://forum.arduino.cc/t/mcp2515-can-filtering/506401 )
+    #ifndef MASK
+      mcp2515.init_Mask(0, 0, MASK);
+      mcp2515.init_Mask(1, 0, MASK);
     #endif
 
-    #ifdef FILTER_SC  
-        mcp2515.init_Filt(0, 0, FILTER_SC);            // init_Filt(filter number, 0 for standard mode, filter used to accept a matching ID) - Filter 1
+    #ifndef FILTER_SC
+      mcp2515.init_Filt(0, 0, FILTER_SC);                     // init_Filt(filter number, 0 for standard mode, filter used to accept a matching ID) - Filter 1
     #endif
 
     mcp2515.setMode(MCP_NORMAL);                              // Change to normal mode to allow messages to be transmitted

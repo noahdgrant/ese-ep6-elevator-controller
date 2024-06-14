@@ -19,7 +19,7 @@ void setup() {
   // Do not need to attach anything to the timer-based interrupt. It will automatically call ISR(TIMER1_COMPA_vect) when triggered. It is on a register external to the microcontroller.
 }
 
-// Timer-based Interrupt routine for timer1 (occurs at 0.25 Hz 0r 4 seconds) - This ISR is called when the timer-based interrupt is triggered and is exteral to the ElevatorController Object
+// Timer-based Interrupt routine for timer1 -- This ISR is called when the timer-based interrupt is triggered and is exteral to the ElevatorController Object
 ISR(TIMER1_COMPA_vect) {
     EC.flagTx = true;
 }
