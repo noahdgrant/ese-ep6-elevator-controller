@@ -64,12 +64,17 @@ void ElevatorController::loop() {
 // Set up interrupt timing for transmit interval (EC sends current floor every 2 seconds) 
 void ElevatorController::initializeTimer() {                     
     cli();                                                              // stop interrupts
-    // Set timer1 interrupt to 1Hz by setting the registers --> See register map and tutorial at:  https://www.instructables.com/Arduino-Timer-Interrupts/
+    // Set timer1 interrupt by setting the registers --> See register map and tutorial at:  https://www.instructables.com/Arduino-Timer-Interrupts/
     TCCR1A = 0;                                                         // Set TCCR1A register to 0 (clear existing control values so we can set functionality below)
     TCCR1B = 0;                                                         // Set TCCR1B register to 0 (clear existing control valuesso we can set functionality below)
     TCNT1 = 0;                                                          // Initialize the counter value for timer1 to 0
-    // Set the compare match register (binary value) so we get 1 Hz increments (as described above with prescaler of 1024)
-    OCR1A = 32767;   // T=2 seconds      //15624;  //T=1 second         // [(16*10^6) / (1/T *1024)] - 1     --> Control Register for timer1 must be below 65536 since it is a 16-bit register (you can modify the prescaler value if too large)
+
+    // Set the compare match register (binary value) so we get our desired Hz increments (as described above with prescaler of 1024)
+    // [(16*10^6) / (1/T *1024)] - 1     --> Control Register for timer1 must be below 65536 since it is a 16-bit register (you can modify the prescaler value if too large)
+    // 15624 -> T=1 second
+    // 32767 -> T=2 seconds
+    OCR1A = 15624;
+
     // Turn on CTC Mode for timer1
     TCCR1B |= (1 << WGM12);                                             // WGM12 == 3 (turn on CTC Mode for timer1)
     // Set the CS10 and CS12 bits in TCCR1B to give a prescaler = 1024
