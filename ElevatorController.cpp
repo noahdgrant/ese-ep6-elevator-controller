@@ -103,7 +103,7 @@ void ElevatorController::Move(uint16_t setpoint) {
         difference = m_dist - setpoint;        // positive value means above setpoint (later take the negative of this value to indicate direction to move - i.e. down)
         //Serial.print("Distance ");           // Testing
         //Serial.println(m_dist);              // Testing
-        if (abs(difference) <= 50) {           // Stop when within 5cm of setpoint
+        if (abs(difference) <= SETPOINT_TOLERANCE) {
             difference = 0;
         }
 
