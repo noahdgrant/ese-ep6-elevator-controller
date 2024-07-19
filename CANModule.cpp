@@ -101,7 +101,7 @@ void CANModule::receiveCAN(LCD lcd) {
 void CANModule::initializeCAN() {
     Serial.println("Starting CAN init");
     // Initialize MCP2515 running at 8MHz with a baudrate of 125kb/s and the masks and filters enabled in standard mode. (USE MCP_ANY to disable masks and filters and MCP_STD to only check the ID bytes)
-    if (mcp2515.begin(MCP_STD, CAN_125KBPS, MCP_8MHZ) == CAN_OK) {              // Change to MCP_ANY TO DISABLE MASK AND FILTERS, MCP_STD to use CAN Standard mode IDs
+    if (mcp2515.begin(MCP_STDEXT, CAN_125KBPS, MCP_8MHZ) == CAN_OK) {              // Change to MCP_ANY TO DISABLE MASK AND FILTERS, MCP_STD to use CAN Standard mode IDs
         Serial.println("MCP2515 Initialized Successfully!");   
     }
     else {
@@ -109,12 +109,12 @@ void CANModule::initializeCAN() {
     }
     Serial.println("Finished CAN init");
 
-    #ifndef MASK
+    #ifdef MASK
       mcp2515.init_Mask(0, 0, MASK);
       mcp2515.init_Mask(1, 0, MASK);
     #endif
 
-    #ifndef FILTER_SC
+    #ifdef FILTER_SC
       mcp2515.init_Filt(0, 0, FILTER_SC);                     // init_Filt(filter number, 0 for standard mode, filter used to accept a matching ID) - Filter 1
     #endif
 
