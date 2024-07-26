@@ -126,12 +126,13 @@ void ElevatorController::Move(uint16_t setpoint) {
 }
 
 void ElevatorController::checkCurrentFloor() {
+
     // Check current floor
-    if ((m_dist >= FLOOR1_SP - 50) && (m_dist <= FLOOR1_SP + 50)) {
+    if ((m_dist >= FLOOR1_SP - (SETPOINT_TOLERANCE + 10)) && (m_dist <= FLOOR1_SP + (SETPOINT_TOLERANCE + 10))) {
         m_currentFloor = FLOOR1;
-    } else if ((m_dist >= FLOOR2_SP - 50) && (m_dist <= FLOOR2_SP + 50)) {
+    } else if ((m_dist >= FLOOR2_SP - (SETPOINT_TOLERANCE + 10)) && (m_dist <= FLOOR2_SP + (SETPOINT_TOLERANCE + 10))) {
         m_currentFloor = FLOOR2;
-    } else if ((m_dist >= FLOOR3_SP - 50) && (m_dist <= FLOOR3_SP + 50)) {
+    } else if ((m_dist >= FLOOR3_SP - (SETPOINT_TOLERANCE + 10)) && (m_dist <= FLOOR3_SP + (SETPOINT_TOLERANCE + 10))) {
         m_currentFloor = FLOOR3;
     } else {
       // If the car is between floors, keep repeating the last known floor
